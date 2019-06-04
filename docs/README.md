@@ -1,8 +1,15 @@
-## Welcome to GitHub Pages
+## Using these materials
 
-You can use the [editor on GitHub](https://github.com/umnmsi/pearc19_puppet/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+The materials below are provided particularly in hopes that they might help others
+to recreate some or all of the techniques practiced at the Minnesota Supercomputing
+Institute to manage systems with [Puppet](https://puppet.com/).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Codes and configuration files tend to be unaltered from those in use at MSI, and in
+some cases we refer you to the living canonical repository that MSI builds against.
+As a result, some materials include MSI names and nomenclature that render them 
+unsuitable for direct copy/paste usage. We believe they are still valuable
+references to readers with detailed questions, and as examples for operators creating
+similar deployments.
 
 ### Markdown
 

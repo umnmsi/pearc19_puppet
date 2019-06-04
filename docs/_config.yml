@@ -1,1 +1,3 @@
 theme: jekyll-theme-cayman
+title: Code & Configuration Examples
+description: Supplement to _A Multi-Environment HPC-Scale Puppet Infrastructure for Compliance and Systems Automation_ (PEARC '19)
