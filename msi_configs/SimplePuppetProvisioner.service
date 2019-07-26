@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Puppet Provisioner
+After=network.target
+
+[Service]
+Type=simple
+User=puppet
+WorkingDirectory=/tmp
+ExecStart=/usr/local/bin/SimplePuppetProvisioner
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
