@@ -37,14 +37,14 @@ node's role.
 We start from this template when we need to create a control repository for
 a new cluster at MSI.
 
-**Source code**: https://github.com/umnmsi/control_repository_template
+**Source code**: [https://github.com/umnmsi/control_repository_template](https://github.com/umnmsi/control_repository_template).
 
 ### PDK Template
 
 This template for PDK causes new modules that we create to include Jenkins CI support. We've
 also made it feasible to write rspec tests involving dependent modules that include eyaml,
 without requiring the private key to be in Jenkins or on developer workstations.
-It's based on https://github.com/puppetlabs/pdk-templates.
+It's based on [https://github.com/puppetlabs/pdk-templates](https://github.com/puppetlabs/pdk-templates).
 
 **Source code**: [https://github.com/umnmsi/puppet-pdk-templates](https://github.com/umnmsi/puppet-pdk-templates)
 
