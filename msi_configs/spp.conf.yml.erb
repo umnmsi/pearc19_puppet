@@ -1,0 +1,84 @@
+BindAddress: <%= @bind_address %>:<%= @bind_port %>
+LogFile: <%= @log_file %>
+
+ProvisionAuth:
+  Type: digest
+  Realm: puppetca.msi.umn.edu
+  DbFile: /opt/puppetlabs/server/data/puppetserver/spp.htdigest
+
+PuppetExecutable: /opt/puppetlabs/bin/puppet
+
+# This defaults to /etc/puppetlabs/puppet which is almost always correct, so should not need to be set here.
+# PuppetConfDir: /etc/puppetlabs/puppet
+
+# You may define any arbitrary commands to be run as tasks here during node provisioning.
+# The Name attribute defines how to reference the command when calling the /provision http API.
+#
+# The Command attribute is the command to be run on the system, relative to the working directory
+# of the process. An exception is that the Command "puppet" will be converted to the value of
+# PuppetExecutable, and the systemwide config file and confdir flags will be added to the arguments.
+#
+# Arguments are passed to the command directly (e.g. not through any shell) in the order you
+# specify them here. Arguments are passed through a template processor that supports accessing
+# any value passed by the client in its http POST body. These may be forwarded on to the command
+# by using a template notation like {{request "nameOfPostValue"}}
+#
+# The optional SuccessMessage and ErrorMessage attributes are templates specifying messages added
+# to the HTTP response json and sent on any configured notification channels. In addition to the
+# http POST values, {{stdout}} and {{stderr}} are available.
+#
+# The optional Reentrant attribute indicates that it is safe to run multiple instances of the
+# command simultaneously (e.g. in the servicing of different API calls received around the same time.)
+# By default the service will only invoke one instance of each Command at a time.
+GenericExecTasks:
+  - Name: environment
+    SuccessMessage: '{{ StdOut }}'
+    ErrorMessage: 'ERROR assigning "{{request "hostname"}}" to the "{{request "environment"}}" environment. More info in the log.'
+    Command: /opt/puppetlabs/server/data/puppetserver/set-environment.rb
+    Args:
+      - '{{request "hostname"}}'
+      - '{{request "environment"}}'
+      - '{{request "primary_role"}}'
+
+GithubWebhooks:
+  Secret: '<%= @webhook_secret %>'
+  EnableStandardR10kListener: false
+  R10kExecutable: /opt/puppetlabs/puppet/bin/r10k
+  Listeners:
+    - Event: status
+      ExecConfig:
+        Name: status update
+        SuccessMessage: |-
+          "{{request "$.commit.commit.message" | printf "%.35s"}}{{ if gt (request "$.commit.commit.message" | len) 35}}...{{end}}" by {{request "$.commit.author.login"}} in {{request "$.repository.name"}}:{{request "$.branches[0].name"}}: {{request "$.description"}} {{request "$.target_url"}}
+        FailureMessage: ''
+        Command: /opt/puppetlabs/server/data/puppetserver/spp-status-filter.sh
+        Args:
+          - '{{request "$.description"}}'
+    - Event: push
+      ExecConfig:
+        Name: custom sync example
+        SuccessMessage: >-
+          {{if eq (request "$.deleted") "true"}}Branch {{request "$.repository.name"}}:{{request "$.ref"}} deletion by {{request "$.pusher.name"}}
+          {{else}}"{{request "$.head_commit.message" | printf "%.35s"}}{{if gt (request "$.head_commit.message" | len) 35}}...{{end}}" by {{request "$.head_commit.author.username"}} in {{request "$.repository.name"}}:{{request "$.ref"}}
+          {{end}}has been synchronized to all compile masters: {{request "$.compare"}}{{if gt (StdOut | len) 0}}
+
+          {{StdOut | printf "%.200s"}}{{if gt (StdOut | len) 200}}...{{end}}{{end}}{{if gt (StdErr | len) 0}}
+
+          Warning: {{StdErr | printf "%.200s"}}{{if gt (StdErr | len) 200}}...{{end}}{{end}}{{if or (gt (StdOut | len) 200) (gt (StdErr | len) 200)}}
+
+          Output was truncated, more at http://puppetca.msi.umn.edu/log{{end}}
+        ErrorMessage: >-
+          ERROR synchronizing
+          {{if eq (request "$.deleted") "true"}}branch {{request "$.repository.name"}}:{{request "$.ref"}} deletion.
+          {{else}}commit "{{request "$.head_commit.message" | printf "%.25s"}}{{ if gt (request "$.head_commit.message" | len) 25}}...{{end}}".
+          {{end}}r10k says: {{StdErr | printf "%.100s"}}{{if gt (StdErr | len) 100}}... [Truncated, more at http://puppetca.msi.umn.edu/log]{{end}}
+        Command: /opt/puppetlabs/server/data/puppetserver/spp-r10k-sync.sh
+        Args:
+          - '{{request "$.repository.name"}}'
+          - '{{request "$.ref"}}'
+          - '{{request "$.deleted"}}'
+
+Notifications:
+  - Type: gchat
+    Webhooks:
+      - https://chat.googleapis.com/v1/spaces/ABCD8WwNgeek/messages?key=notforyou;)
