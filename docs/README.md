@@ -3,8 +3,7 @@
 The materials below are provided particularly in hopes that they might help others
 to recreate some or all of the techniques practiced at the Minnesota Supercomputing
 Institute to manage systems with [Puppet](https://puppet.com/). A careful read of the
-full paper will provide additional context, but we do not necessarily assume you have
-done so and provide some explanation of each item.
+full paper will provide additional context, but we provide some explanation of each item.
 
 Codes and configuration files tend to be unaltered from those in use at MSI, and in
 some cases we refer you to the living canonical repository that MSI builds against.
